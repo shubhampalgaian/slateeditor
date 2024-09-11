@@ -1,0 +1,52 @@
+{
+  "name": "my-vite-project",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@emotion/css": "^11.13.0",
+    "@slate-editor/bold-plugin": "^5.1.0",
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^11.2.7",
+    "@testing-library/user-event": "^12.8.3",
+    "emotion": "^11.0.0",
+    "image-extensions": "^1.1.0",
+    "interweave": "^12.9.0",
+    "is-hotkey": "^0.2.0",
+    "is-url": "^1.2.4",
+    "quill-better-table": "^1.2.10",
+    "quill-image-resize-module": "^3.0.0",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-editor-js": "^1.10.0",
+    "react-icons": "^4.12.0",
+    "react-katex": "^2.0.2",
+    "react-quill": "^2.0.0",
+    "slate": "^0.63.0",
+    "slate-deep-table": "^0.9.7",
+    "slate-editor": "^5.1.1",
+    "slate-history": "^0.62.0",
+    "slate-hyperscript": "^0.62.0",
+    "slate-react": "^0.65.3",
+    "web-vitals": "^1.1.2",
+    "xmlbuilder2": "^3.1.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.9.0",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "eslint": "^9.9.0",
+    "eslint-plugin-react": "^7.35.0",
+    "eslint-plugin-react-hooks": "^5.1.0-rc.0",
+    "eslint-plugin-react-refresh": "^0.4.9",
+    "globals": "^15.9.0",
+    "vite": "^5.4.1"
+  }
+}
