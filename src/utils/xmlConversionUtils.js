@@ -1,104 +1,47 @@
 import { create } from 'xmlbuilder2';
 
-// Function to create paragraphs
-function createParagraph(paragraphData) {
-  const p = { p: [] };
-  paragraphData.children.forEach((child) => {
-    if (child.bgColor || child.color) {
-      p.p.push({
-        ph: {
-          '@props': `background-color: ${child.bgColor}; color: ${child.color}`,
-          '#': child.text || "",
-        },
-      });
-    } else {
-      p.p.push({ '#': child.text || "" });
-    }
-  });
-  return p;
+// Helper function to create a title
+function createTitle(block) {
+  return { title: { '#text': block.children[0].text || block.default || 'Untitled Title' } };
 }
 
-// Function to create table structure
-function createTable(tableData) {
-  const tgroup = {
-    tgroup: {
-      '@cols': tableData.children[0].children.length,
-      thead: { row: [] },
-      tbody: { row: [] },
-    },
-  };
-
-  // Process rows
-  tableData.children.forEach((row, index) => {
-    const rowElement = { row: { entry: [] } };
-    row.children.forEach((cell) => {
-      rowElement.row.entry.push({ p: cell.children[0].children[0].text || "" });
-    });
-
-    if (index === 0) {
-      // First row goes to thead
-      tgroup.tgroup.thead.row.push(rowElement.row);
-    } else {
-      // Other rows go to tbody
-      tgroup.tgroup.tbody.row.push(rowElement.row);
-    }
-  });
-
-  return { table: tgroup };
+// Helper function to create a paragraph
+function createParagraph(block) {
+  return { p: { '#text': block.children[0].text || block.default || '' } };
 }
 
-// Function to create lists (ordered or unordered)
-function createList(listData) {
-  const list = listData.ordered ? { ol: { li: [] } } : { ul: { li: [] } };
-
-  listData.children.forEach((item) => {
-    list[listData.ordered ? 'ol' : 'ul'].li.push({ p: item.text || "" });
-  });
-
-  return list;
-}
-
-// Function to create notes
-function createNote(noteData) {
-  return { note: { p: noteData.text || "" } };
-}
-
-// Function to create figures
-function createFigure(figureData) {
-  const figure = { figure: { title: figureData.title, image: { '@href': figureData.src } } };
-  return figure;
+// Recursive function to traverse the JSON structure and append elements to the XML
+function processJsonBlock(xml, block) {
+  switch (block.type) {
+    case 'topic':
+      const topic = xml.ele('topic', { id: 'something', xmlns: 'http://dita.oasis-open.org/architecture/2005/' });
+      block.children?.forEach(child => processJsonBlock(topic, child));
+      break;
+    case 'title':
+      xml.ele(createTitle(block));
+      break;
+    case 'body':
+      const body = xml.ele('body');
+      block.children?.forEach(child => processJsonBlock(body, child));
+      break;
+    case 'paragraph':
+      xml.ele(createParagraph(block));
+      break;
+    // Add additional DITA constructs here (e.g., 'section', 'table', 'list', etc.)
+    default:
+      console.log(`Unsupported block type: ${block.type}`);
+  }
 }
 
 // Main function to convert JSON to DITA XML
 export function convertJsonToDita(jsonData) {
-  console.log('json data in convert function', jsonData);
-  const topic = create({ version: '1.0', encoding: 'UTF-8' })
-    .ele('topic', { id: 'extended-dita-topic', xmlns: 'http://dita.oasis-open.org/architecture/2005/' })
-    .ele('title').txt('Extended DITA Test').up()  // Adding the title
-    .ele('body');
+  // Create the root XML document
+  const ditaXml = create({ version: '1.0', encoding: 'UTF-8' })
+    .ele('root'); // You need a root node to wrap the whole document
 
-  // Iterate over the JSON data and append elements
-  jsonData.forEach((block) => {
-    switch (block.type) {
-      case 'paragraph':
-        topic.ele(createParagraph(block));
-        break;
-      case 'table':
-        topic.ele(createTable(block));
-        break;
-      case 'list':
-        topic.ele(createList(block));
-        break;
-      case 'note':
-        topic.ele(createNote(block));
-        break;
-      case 'figure':
-        topic.ele(createFigure(block));
-        break;
-      default:
-        console.log(`Unsupported block type: ${block.type}`);
-    }
-  });
+  // Traverse the entire JSON data structure recursively
+  jsonData.forEach(block => processJsonBlock(ditaXml, block));
 
-  return topic.end({ prettyPrint: true });
+  // Return the final XML string
+  return ditaXml.end({ prettyPrint: true });
 }

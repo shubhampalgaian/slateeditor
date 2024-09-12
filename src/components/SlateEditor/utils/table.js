@@ -25,7 +25,6 @@ export class TableUtil{
         Transforms.insertNodes(this.editor,newTable,{
             mode:'highest'
         });
-        Transforms.insertNodes(this.editor,{type:'paragraph',children:[{text:""}]},{mode:'highest'})
     }
 
 

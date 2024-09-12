@@ -54,13 +54,6 @@ td{
 button{
     cursor: pointer;
 }
-/* Editor.css */
-.editor-wrapper span[contenteditable="false"] {
-    color: grey;
-    font-style: italic;
-    opacity: 0.6;
-}
-
 
 .relative-section {
     position: relative;
@@ -75,7 +68,7 @@ button{
     pointer-events: none;    
     width: 100%;
     background-color: beige;
-    height: 20px;
+    /* height: 20px; */
 }
 
 .haha {

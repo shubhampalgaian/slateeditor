@@ -15,6 +15,7 @@ import InTable from '../Elements/Table/InTable'
 import EquationButton from '../Elements/Equation/EquationButton'
 import Id from '../Elements/ID/Id'
 import SectionButton from '../Elements/Section/Sections.jsx';
+import TopicButton from '../Elements/Topic/Topic.jsx';
 const Toolbar = ()=>{
     const editor = useSlate();
     const isTable = useTable(editor);
@@ -104,6 +105,8 @@ const Toolbar = ()=>{
                                             return <EquationButton editor={editor}/>
                                         case 'section':
                                             return <SectionButton editor={editor}/>
+                                        case 'topic':
+                                            return <TopicButton editor={editor}/>
                                         default:
                                             return <button>Invalid Button</button>
                                     }

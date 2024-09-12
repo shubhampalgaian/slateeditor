@@ -16,12 +16,13 @@ const SectionButton = ({ editor }) => {
         {
           type: 'paragraph',
           children: [{ text: '', placeholder: true }],
-          default: 'add Paragraph...'
+          placeholder: true,
+          default: 'p'
         }
       ]
     };
 
-    Transforms.insertNodes(editor, section, {mode: 'highest'});
+    Transforms.insertNodes(editor, section, { at: editor.selection });
   };
 
   return (

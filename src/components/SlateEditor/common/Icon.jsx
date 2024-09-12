@@ -1,5 +1,5 @@
 import React from 'react';
-import { MdFormatBold, MdFormatItalic, MdStrikethroughS, MdFormatUnderlined, MdFormatQuote, MdFormatAlignLeft, MdFormatAlignCenter, MdFormatAlignRight, MdFormatListNumbered, MdFormatListBulleted,MdInsertLink,MdVideoLibrary,MdImage,MdAdd, MdLineWeight} from 'react-icons/md'
+import { MdFormatBold, MdFormatItalic, MdStrikethroughS, MdFormatUnderlined, MdFormatQuote, MdFormatAlignLeft, MdFormatAlignCenter, MdFormatAlignRight, MdFormatListNumbered, MdFormatListBulleted,MdInsertLink,MdVideoLibrary,MdImage,MdAdd, MdLineWeight, MdTopic} from 'react-icons/md'
 import { BsTypeH1, BsTypeH2, BsTypeH3 } from 'react-icons/bs'
 import { FaSuperscript,FaSubscript } from 'react-icons/fa'
 import { AiOutlineTable, AiOutlineInsertRowBelow, AiOutlineInsertRowRight,AiOutlineDelete, AiFillTag, AiOutlineUpload } from 'react-icons/ai'
@@ -32,7 +32,8 @@ const iconList={
     addId:<AiFillTag size={20}/>,
     upload:<AiOutlineUpload size = {20}/>,
     equation:<SiLatex size={20} />,
-    section:<MdLineWeight />
+    section:<MdLineWeight />,
+    topic:<MdTopic />
 }
 
 

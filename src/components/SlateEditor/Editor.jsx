@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from "react";
-import { createEditor } from "slate";
+import { Transforms, createEditor } from "slate";
 import { withHistory } from "slate-history";
 import { Slate, Editable, withReact } from "slate-react";
 import Toolbar from "./Toolbar/Toolbar";
@@ -18,138 +18,59 @@ import { convertJsonToDita } from "../../utils/xmlConversionUtils.js";
 
 const Element = (props) => {
   const { attributes, children, element } = props;
+  let childIndex = 0;
+
+  const renderChildren = (childElements) => {
+    return childElements.map((child, index) => {
+      if (child.type === "body" && child.children) {
+        return renderChildren(child.children);
+      }
+
+      const hasPlaceholder = child.children[0]?.text === "" && child.children[0]?.placeholder;
+
+      const currentChild = children[childIndex];
+      childIndex++;
+
+      return (
+        <div key={index} style={{ position: "relative" }}>
+          {hasPlaceholder ? (
+            <div contentEditable={false} className="placeholder">
+              {child.default}
+            </div>
+          ) : null}
+          {currentChild}
+          {console.log(currentChild, " <<<<<<<<<<<<<<<<")}
+        </div>
+      );
+    });
+  };
 
   switch (element.type) {
-    case "headingOne":
-      return (
-        <h1 {...attributes} {...element.attr}>
-          {children}
-        </h1>
-      );
-    case "headingTwo":
-      return (
-        <h2 {...attributes} {...element.attr}>
-          {children}
-        </h2>
-      );
-    case "headingThree":
-      return (
-        <h3 {...attributes} {...element.attr}>
-          {children}
-        </h3>
-      );
-    case "blockquote":
-      return (
-        <blockquote {...attributes} {...element.attr}>
-          {children}
-        </blockquote>
-      );
-    case "alignLeft":
-      return (
-        <div
-          style={{ listStylePosition: "inside" }}
-          {...attributes}
-          {...element.attr}
-        >
-          {children}
-        </div>
-      );
-    case "alignCenter":
-      return (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            listStylePosition: "inside",
-          }}
-          {...attributes}
-          {...element.attr}
-        >
-          {children}
-        </div>
-      );
-    case "alignRight":
-      return (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "flex-end",
-            listStylePosition: "inside",
-          }}
-          {...attributes}
-          {...element.attr}
-        >
-          {children}
-        </div>
-      );
-    case "list-item":
-      return (
-        <li {...attributes} {...element.attr}>
-          {children}
-        </li>
-      );
-    case "orderedList":
-      return (
-        <ol type="1" {...attributes}>
-          {children}
-        </ol>
-      );
-    case "unorderedList":
-      return <ul {...attributes}>{children}</ul>;
-    case "link":
-      return <Link {...props} />;
-
-    case "table":
-      return (
-        <table>
-          <tbody {...attributes}>{children}</tbody>
-        </table>
-      );
-    case "table-row":
-      return <tr {...attributes}>{children}</tr>;
-    case "table-cell":
-      return (
-        <td {...element.attr} {...attributes}>
-          {children}
-        </td>
-      );
-    case "image":
-      return <Image {...props} />;
-    case "video":
-      return <Video {...props} />;
-    case "equation":
-      return <Equation {...props} />;
     case "section":
+      return <div {...attributes}>{renderChildren(element.children)}</div>;
+    case "topic":
+      return <div {...attributes}>{renderChildren(element.children)}</div>;
+    default:
       return (
-        <div {...attributes} className="relative-section">
+        <div {...element.attr} {...attributes}>
           {element.children.map((child, index) => {
-            const hasPlaceholder = child.children[0]?.text === "" && child.children[0]?.placeholder;
-    
+            const hasPlaceholder = child.text === "" && child.placeholder;
             return (
-              <div key={index} style={{ position: 'relative' }}>
+              <div key={index} style={{ position: "relative" }}>
                 {hasPlaceholder ? (
-                  <div
-                    contentEditable={false}
-                    className="placeholder"
-                  >
+                  <div contentEditable={false} className="placeholder">
                     {child.default}
                   </div>
-                ) : null}    
+                ) : null}
                 {children[index]}
               </div>
             );
           })}
         </div>
       );
-      
-    default:
-      return (
-        <div {...element.attr} {...attributes}>
-          {children}
-        </div>
-      );
   }
 };
+
 const Leaf = ({ attributes, children, leaf }) => {
   if (leaf.bold) {
     children = <strong>{children}</strong>;
@@ -206,6 +127,11 @@ const SlateEditor = () => {
   );
 
   const [value, setValue] = useState([
+    {
+      type: "paragraph",
+      children: [{ text: "as it is", placeholder: true, default: 'p' }],
+      default: 'p'
+    },
   ]);
 
   const [ditaXml, setDitaXml] = useState("");
@@ -256,9 +182,20 @@ const SlateEditor = () => {
         style={{ border: "1px solid #f3f3f3", padding: "0 10px" }}
       >
         <Editable
-          placeholder="Write something"
+          // placeholder="Write something"
           renderElement={renderElement}
           renderLeaf={renderLeaf}
+          onKeyDown={event => {
+            if (event.key === 'Enter') {
+              event.preventDefault();
+              Transforms.insertNodes(editor, {
+                type: 'paragraph',
+                children: [{ text: '', bold: true, placeholder: true, default: 'p' }
+                ]
+              })
+              return;
+            }
+          }}
         />
       </div>
     </Slate>

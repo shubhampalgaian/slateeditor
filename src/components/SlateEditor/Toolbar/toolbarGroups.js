@@ -150,6 +150,10 @@ const toolbarGroups = [
         {
             id:27,
             type:'section'
+        },              
+        {
+            id:28,
+            type:'topic'
         }
     ],
 
