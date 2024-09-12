@@ -1,110 +1,91 @@
-import { Transforms, Editor, Range, Element } from 'slate'
+import { Transforms, Editor, Range, Element } from 'slate';
 
+export class TableUtil {
+  constructor(editor) {
+    this.editor = editor;
+  }
 
-export class TableUtil{
-    constructor(editor){
-        this.editor = editor;
+  insertTable = (rows, columns) => {
+    if (!rows || !columns) return;
+
+    const cellText = Array.from({ length: rows }, () => Array.from({ length: columns }, () => ""));
+    const newTable = createTableNode(cellText);
+
+    Transforms.insertNodes(this.editor, newTable, { mode: 'highest' });
+  };
+
+  insertCells = (tableNode, path, action) => {
+    console.log("inside cells")
+    let existingText = Array.from(tableNode.children, (row) => 
+      Array.from(row.children, (cell) => cell.children[0].text || '')
+    );
+    const columns = existingText[0].length;
+
+    if (action === 'row') {
+      existingText.push(Array(columns).fill(""));
+    } else if (action === 'column') {
+      existingText = existingText.map(row => [...row, ""]);
     }
 
-    insertTable = (rows,columns)=>{
+    const newTable = createTableNode(existingText);
+    Transforms.removeNodes(this.editor, { at: path });
+    Transforms.insertNodes(this.editor, newTable, { at: path });
+  };
 
-        const [tableNode] = Editor.nodes(this.editor,{
-            match:n => !Editor.isEditor(n) && Element.isElement(n) && n.type === 'table',
-            mode:'highest',
-        })
-        
-        if(tableNode) return;
-        if(!rows || !columns){
-            return;
-        }
-        const cellText = Array.from({ length: rows }, () => Array.from({ length: columns }, () => ""))
-        const newTable = createTableNode(cellText);
-        
-    
-    
-        Transforms.insertNodes(this.editor,newTable,{
-            mode:'highest'
-        });
+  removeTable = () => {
+    Transforms.removeNodes(this.editor, {
+      match: n => !Editor.isEditor(n) && Element.isElement(n) && n.type === 'table',
+      mode: 'highest'
+    });
+  };
+
+  insertRow = () => {
+    const { selection } = this.editor;
+    if (selection && Range.isCollapsed(selection)) {
+      const [tableNode, path] = Array.from(Editor.nodes(this.editor, {
+        match: n => !Editor.isEditor(n) && Element.isElement(n) && n.type === 'table',
+      }))[0];
+
+      if (tableNode) {
+        this.insertCells(tableNode, path, 'row');
+      }
     }
+  };
 
+  insertColumn = () => {
+    const { selection } = this.editor;
+    if (selection && Range.isCollapsed(selection)) {
+      const [tableNode, path] = Array.from(Editor.nodes(this.editor, {
+        match: n => !Editor.isEditor(n) && Element.isElement(n) && n.type === 'table',
+      }))[0];
 
-    insertCells = (tableNode,path,action)=>{
-        let existingText = Array.from(tableNode.children,(rows) => Array.from(rows.children,(arr) => arr.children[0].text))
-        const columns = existingText[0].length;
-        if(action === 'row'){
-            existingText.push(Array(columns).fill(""));
-        }
-        else{
-            existingText = Array.from(existingText,(item) => {
-                item.push("");
-                return item
-            })
-        }
-        const newTable = createTableNode(existingText)
-        Transforms.insertNodes(this.editor,newTable,{
-            at:path
-        })
+      if (tableNode) {
+        this.insertCells(tableNode, path, 'column');
+      }
     }
-
-    removeTable = () => {
-        Transforms.removeNodes(this.editor,{
-            match:n=> !Editor.isEditor(n) && Element.isElement(n) && n.type === 'table',
-            mode:'highest'
-        })
-    }
-
-    insertRow = ()=>{
-        const {selection} = this.editor;
-        if(!!selection && Range.isCollapsed(selection)){
-            const [tableNode] = Editor.nodes(this.editor,{
-                match:n => !Editor.isEditor(n) && Element.isElement(n) && n.type === 'table',
-            })
-            if(tableNode){
-                const [oldTable,path] = tableNode
-                this.removeTable();
-                this.insertCells(oldTable,path,'row')
-            }
-        }
-    }
-
-    insertColumn = ()=>{
-        const { selection } = this.editor
-        if(!!selection && Range.isCollapsed(selection)){
-            const [tableNode] = Editor.nodes(this.editor,{
-                match:n => !Editor.isEditor(n) && Element.isElement(n) && n.type === 'table',
-            })
-            if(tableNode){
-                const [oldTable,path] = tableNode
-                this.removeTable();
-                this.insertCells(oldTable,path,'columns')
-            }
-        }
-    }
+  };
 }
 
-
-
-
-const createRow = (cellText)=>{
-    const newRow = Array.from(cellText,(value)=> createTableCell(value));
-    return {
-        type:'table-row',
-        children:newRow
-    };
+const createRow = (cellText) => {
+  const newRow = Array.from(cellText, (value) => createTableCell(value));
+  return {
+    type: 'table-row',
+    children: newRow
+  };
 }
 
-export const createTableCell = (text)=>{
-    return {
-        type:'table-cell',
-        children:[ {
-            type:'paragraph',
-            children:[{text}]
-        } ]
-    }
+export const createTableCell = (text) => {
+  return {
+    type: 'table-cell',
+    children: [{
+      type: 'paragraph',
+      children: [{ text }]
+    }]
+  };
 }
 
-const createTableNode = (cellText)=>{
-    const tableChildren = Array.from( cellText,(value) => createRow(value))
-    let tableNode = {type:'table',children:tableChildren}
-    return tableNode;
+const createTableNode = (cellText) => {
+  const tableChildren = Array.from(cellText, (value) => createRow(value));
+  let tableNode = { type: 'table', children: tableChildren };
+  return tableNode;
 }

@@ -98,7 +98,7 @@ const Toolbar = ()=>{
                                         case 'table':
                                             return <Table key={element.id} editor={editor}/>
                                         case 'inTable':
-                                            return isTable ? <InTable key={element.id} editor={editor}/> : null
+                                            return <InTable key={element.id} editor={editor}/>
                                         case 'id':
                                             return <Id editor={editor}/>
                                         case 'equation':

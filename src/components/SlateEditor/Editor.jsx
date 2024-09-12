@@ -22,46 +22,130 @@ const Element = (props) => {
 
   const renderChildren = (childElements) => {
     return childElements.map((child, index) => {
+      // Recursively render nested children if type is "body"
       if (child.type === "body" && child.children) {
         return renderChildren(child.children);
       }
 
-      const hasPlaceholder = child.children[0]?.text === "" && child.children[0]?.placeholder;
-
-      const currentChild = children[childIndex];
-      childIndex++;
+      const hasPlaceholder = child.children?.[0]?.text === "" && child.children?.[0]?.placeholder;
+      const currentChild = children[childIndex++];
 
       return (
         <div key={index} style={{ position: "relative" }}>
-          {hasPlaceholder ? (
+          {hasPlaceholder && (
             <div contentEditable={false} className="placeholder">
               {child.default}
             </div>
-          ) : null}
+          )}
           {currentChild}
-          {console.log(currentChild, " <<<<<<<<<<<<<<<<")}
         </div>
       );
     });
   };
 
+  const commonRender = (Tag) => (
+    <Tag
+      {...attributes}
+      {...element.attr}
+      data-type={element.type}
+    >
+      {children}
+    </Tag>
+  );
+
   switch (element.type) {
+    case "headingOne":
+      return commonRender("h1");
+    case "headingTwo":
+      return commonRender("h2");
+    case "headingThree":
+      return commonRender("h3");
+    case "blockquote":
+      return commonRender("blockquote");
+    case "alignLeft":
+      return (
+        <div
+          style={{ listStylePosition: "inside" }}
+          {...attributes}
+          {...element.attr}
+          data-type={element.type}
+        >
+          {children}
+        </div>
+      );
+    case "alignCenter":
+    case "alignRight":
+      const justifyContent = element.type === "alignCenter" ? "center" : "flex-end";
+      return (
+        <div
+          style={{ display: "flex", justifyContent, listStylePosition: "inside" }}
+          {...attributes}
+          {...element.attr}
+          data-type={element.type}
+        >
+          {children}
+        </div>
+      );
+    case "list-item":
+      return commonRender("li");
+    case "orderedList":
+      return (
+        <ol type="1" {...attributes} data-type={element.type}>
+          {children}
+        </ol>
+      );
+    case "unorderedList":
+      return (
+        <ul {...attributes} data-type={element.type}>
+          {children}
+        </ul>
+      );
+    case "link":
+      return <Link {...props} data-type={element.type} />;
+    case "table":
+      return (
+        <table data-type={element.type}>
+          <tbody {...attributes}>{children}</tbody>
+        </table>
+      );
+    case "table-row":
+      return (
+        <tr {...attributes} data-type={element.type}>
+          {children}
+        </tr>
+      );
+    case "table-cell":
+      return (
+        <td {...element.attr} {...attributes} data-type={element.type}>
+          {children}
+        </td>
+      );
+    case "image":
+      return <Image {...props} data-type={element.type} />;
+    case "video":
+      return <Video {...props} data-type={element.type} />;
+    case "equation":
+      return <Equation {...props} data-type={element.type} />;
     case "section":
-      return <div {...attributes}>{renderChildren(element.children)}</div>;
     case "topic":
-      return <div {...attributes}>{renderChildren(element.children)}</div>;
+      return (
+        <div {...attributes} data-type={element.type}>
+          {renderChildren(element.children)}
+        </div>
+      );
     default:
       return (
-        <div {...element.attr} {...attributes}>
+        <div {...element.attr} {...attributes} data-type={element.type}>
           {element.children.map((child, index) => {
             const hasPlaceholder = child.text === "" && child.placeholder;
+
             return (
               <div key={index} style={{ position: "relative" }}>
-                {hasPlaceholder ? (
+                {hasPlaceholder && (
                   <div contentEditable={false} className="placeholder">
                     {child.default}
                   </div>
-                ) : null}
+                )}
                 {children[index]}
               </div>
             );
@@ -128,7 +212,7 @@ const SlateEditor = () => {
 
   const [value, setValue] = useState([
     {
-      type: "paragraph",
+      type: "paragaph",
       children: [{ text: "as it is", placeholder: true, default: 'p' }],
       default: 'p'
     },
@@ -190,7 +274,7 @@ const SlateEditor = () => {
               event.preventDefault();
               Transforms.insertNodes(editor, {
                 type: 'paragraph',
-                children: [{ text: '', bold: true, placeholder: true, default: 'p' }
+                children: [{ text: '', placeholder: true, default: 'p' }
                 ]
               })
               return;

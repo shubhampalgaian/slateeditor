@@ -26,7 +26,7 @@ const Table = ({editor})=>{
         setTableInput(newTable)
     },[tableData])
     const table = new TableUtil(editor);
-
+    setShowOptions
     const handleButtonClick = ()=>{
         setSelection(editor.selection);
         setShowOptions(prev => !prev)
