@@ -30,6 +30,7 @@ export class TableUtil {
     const newTable = createTableNode(existingText);
     Transforms.removeNodes(this.editor, { at: path });
     Transforms.insertNodes(this.editor, newTable, { at: path });
+    Transforms.insertNodes(this.editor,{type:'paragraph',children:[{text:"dd"}]},{at: path})
   };
 
   removeTable = () => {

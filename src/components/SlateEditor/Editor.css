@@ -23,15 +23,23 @@ button{
 .editor-wrapper{
     font-family:'Helvetica','Arial', sans-serif;
     border-radius: 10px;
-background: #ffffff;
-box-shadow:  -8px 8px 13px #ededed,
+    background: #ffffff;
+    box-shadow:  -8px 8px 13px #ededed,
              8px -8px 13px #ffffff;
     min-height: 400px;
     height: fit-content;
     padding: 12px 10px;
 }
+
+.editor-wrapper > div {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
 table{
     width:100%;
+    /* margin: 10px 0; */
 }
 td{
     height: 50px;
